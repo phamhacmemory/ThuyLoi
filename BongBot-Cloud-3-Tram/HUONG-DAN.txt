@@ -1,0 +1,42 @@
+FIRMWARE BÔNG BÓT GỬI LÊN SUPABASE
+
+1. Giải nén các tệp của ZIP trực tiếp vào thư mục BongBot-Cloud-3-Tram mà anh đã
+   chạy setup-stations.mjs. Nút Chuan-bi-firmware.bat phải nằm ngang hàng với
+   thư mục firmware, private và tools. Giữ bản firmware cũ để có thể quay lại.
+
+2. Bấm đúp Chuan-bi-firmware.bat, chọn 1 và nhấn Enter để tạo bản nạp BB-01.
+   Script dùng token đã có trong private/stations.json và chứng chỉ CA đã xác
+   minh từ lần setup trước. Supabase và Cloudflare giữ cấu hình đã triển khai.
+   Thư mục firmware-build chứa token riêng của trạm. Giữ thư mục này trên máy anh.
+
+3. Mở firmware-build\BB-01\Station\Station.ino trong Arduino IDE.
+   Dùng ESP32S3 Dev Module, esp32 by Espressif Systems 3.3.7, TinyGPSPlus 1.0.3.
+   Với cổng USB native, bật USB CDC On Boot. Chọn COM của BB-01 và bấm Upload.
+   Giữ thẻ SD đúng trạm. Nếu IDE cần, chọn Huge APP ở Partition Scheme khi
+   board có flash từ 4 MB và sơ đồ phân vùng này phù hợp. Giữ Erase All Flash
+   Before Sketch Upload ở Disabled để bảo toàn thông tin gán trạm trong NVS.
+
+4. Mở Serial Monitor 115200. Nếu cần xem log từ đầu, bấm RESET/EN.
+   Firmware tự lấy cấu hình đã đóng gói. Anh không phải nhập lệnh SET.
+   Kiểm tra Cloud station BB-01, SD ready, PPP IP và ACK verified.
+   Trên https://bongbot-quantrac.pages.dev/, chọn BB-01 và làm mới sau khi có ACK.
+
+5. Khi đã xác nhận BB-01 chạy đúng, anh có thể tạo bản BB-02 và BB-03 bằng
+   cách chọn 2 hoặc 3, với điều kiện phần cứng và APN khớp BB-01. Bấm Upload
+   bằng file Station.ino tương ứng với từng bộ và giữ đúng thẻ SD.
+   Nếu các bộ đấu dây khác, cần cấu hình riêng theo sơ đồ đã kiểm tra.
+
+CẤU HÌNH BB-01 ĐỐI CHIẾU TỪ FILE ANH GỬI
+
+- Modem: ESP RX GPIO18, ESP TX GPIO15, UART2 9600 8N1.
+- GPS: ESP RX GPIO16, UART1 9600 8N1.
+- SD SPI: CS GPIO10, SCK GPIO12, MISO GPIO13, MOSI GPIO11.
+- Đầu dò: ADC GPIO4, 12 bit. Firmware ghi tín hiệu thô và hỗ trợ bảng hiệu
+  chuẩn PSU hoặc EC. Cấu hình đã gửi chưa có bảng hiệu chuẩn. Có thể thêm
+  bảng đo thực vào firmware-template\settings.example.h trước khi tạo bản nạp.
+- DS18B20, DS1307, RS485, đo pin: đang tắt theo cấu hình đã gửi.
+- Lấy mẫu 30 giây. Mẫu còn trên thẻ có thể gửi bù theo đúng trạm, giữ thời
+  điểm đo đã lưu. Nếu chưa có UTC tại thời điểm lấy mẫu, giờ đo để trống.
+- Khi đã nhận ACK khớp mẫu từ Supabase, firmware xóa tệp khỏi hàng đợi.
+  Mẫu bị HTTP 400, 409, 413 hoặc 422 chuyển vào /rejected để có thể kiểm tra.
+- Dữ liệu mới lên Supabase. Lịch sử SQLite đã nhận trên laptop vẫn ở laptop.

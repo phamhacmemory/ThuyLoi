@@ -1,0 +1,3 @@
+#pragma once
+#define STATION_ID "BB-01"
+#define STATION_TOKEN "2c72e6221dd6fc93787b92eec589f664f9e2ad8c42a98d90c73db60321b231ae"

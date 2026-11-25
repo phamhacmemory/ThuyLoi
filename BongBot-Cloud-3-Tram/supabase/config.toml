@@ -1,0 +1,3 @@
+project_id = "bongbot-cloud"
+[functions.ingest]
+verify_jwt = false
